@@ -1,6 +1,16 @@
 version: "3"
 
 services:
+  sql_server_dev:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    hostname: mssql
+    container_name: sql_server_dev
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: yourStrong(@@Password12
+  
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     hostname: zookeeper

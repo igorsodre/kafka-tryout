@@ -1,1 +1,3 @@
-create and run the database container: `docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=yourStrong(@@Password12" --name sql_server_dev -h mssql -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest`
+# Overview
+
+Project intended to demo a simple kafka setup
