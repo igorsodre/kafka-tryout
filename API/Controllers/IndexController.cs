@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using API.Services.Interfaces;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("/")]
+    [Route("/index")]
     public class IndexController : ControllerBase
     {
         private readonly IMessageRepository _messageRepository;
@@ -23,7 +24,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(IndexRequest request, CancellationToken cancellationToken)
         {
-            var result = await _messageRepository.AddMessageAsync(request);
+            var result = await _messageRepository.AddMessageAsync(request, cancellationToken);
 
             if (!result.Success)
             {

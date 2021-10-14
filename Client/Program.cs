@@ -45,7 +45,7 @@ namespace Client
                 Content = "Testing content"
             };
 
-            var result = await _client.PostAsync(BaseUrl, new JsonContent(content));
+            using var result = await _client.PostAsync(BaseUrl, new JsonContent(content));
             var stringResult = await result.Content.ReadAsStringAsync();
             Console.WriteLine(stringResult);
         }

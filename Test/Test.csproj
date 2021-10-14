@@ -24,4 +24,10 @@
       <ProjectReference Include="..\Contracts\Contracts.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="databasesettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
