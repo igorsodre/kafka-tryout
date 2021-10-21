@@ -41,10 +41,9 @@ namespace API.Services
             CancellationToken token = default
         )
         {
-            var twoDaysAgo = DateTime.Now.AddMinutes(-20);
             var numOfResults = Math.Min(numOfRows ?? 15, MaxPageSize);
             var requestContents = await _context.Messages
-                .Where(r => r.CreatedAt > twoDaysAgo && r.MessageType == MessageType.Primary)
+                .Where(r => r.MessageType == MessageType.Primary)
                 .Include(r => r.Replies)
                 .OrderByDescending(r => r.CreatedAt)
                 .Skip((int)(numOfResults * (page ?? 0)))

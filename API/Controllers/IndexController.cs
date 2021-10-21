@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("/index")]
+    [Route("api/index")]
     public class IndexController : ControllerBase
     {
         private readonly IMessageRepository _messageRepository;
