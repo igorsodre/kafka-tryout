@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using API.Domain;
 using API.Kafka;
 using Contracts.Requests.Orders;
 using Contracts.Responses;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -21,8 +17,7 @@ namespace API.Controllers
         {
             _eventProducer = eventProducer;
         }
-
-        // POST: api/Orders
+        
         [HttpPost]
         [Route("place-order")]
         public async Task<IActionResult> PlaceOrder(PlaceOrderRequest request)

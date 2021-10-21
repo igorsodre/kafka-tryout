@@ -12,6 +12,7 @@ using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using DataAccess;
 using FluentValidation.AspNetCore;
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
