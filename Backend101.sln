@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{7025C692-9BE9-4AF0-9343-DFE95C704586}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{FBE2DB9F-76EA-4742-ACB1-223B1DE6C056}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit", "Tests.Unit\Tests.Unit.csproj", "{FBE2DB9F-76EA-4742-ACB1-223B1DE6C056}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
