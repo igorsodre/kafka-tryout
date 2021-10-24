@@ -11,7 +11,7 @@ namespace API.Helpers
     {
         public static PagedResponse<T> CreatePaginatedResponse<T>(
             Func<PaginationQuery, Dictionary<string, string>, Uri> getUri,
-            PaginationFilter query, IEnumerable<T> response,
+            PaginationFilter query, IList<T> response,
             Dictionary<string, string> aditionalParams = null
         )
         {
