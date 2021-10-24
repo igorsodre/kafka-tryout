@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using API.Domain;
 using API.Services;
 using AutoFixture;
 using DataAccess;
@@ -33,11 +34,12 @@ namespace Tests.Unit.Services
             Context.Messages.AddRange(messages);
             await Context.SaveChangesAsync();
 
+
             // Act
-            var result = await _sut.GetMessagesAsync(0, 15);
+            var result = await _sut.GetMessagesAsync(new PaginationFilter { PageNumber = 1, PageSize = 15 });
 
             // Assert
-            result.Data.Should()
+            result.Should()
                 .BeEquivalentTo(messages);
         }
     }

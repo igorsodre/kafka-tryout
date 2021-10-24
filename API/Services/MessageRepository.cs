@@ -35,22 +35,19 @@ namespace API.Services
         }
 
 
-        public async Task<DefaultResult<IEnumerable<Message>>> GetMessagesAsync(
-            uint? page,
-            uint? numOfRows,
+        public async Task<IList<Message>> GetMessagesAsync(
+            PaginationFilter filter,
             CancellationToken token = default
         )
         {
-            var numOfResults = Math.Min(numOfRows ?? 15, MaxPageSize);
-            var requestContents = await _context.Messages
+            var skip = (filter.PageNumber - 1) * filter.PageSize;
+            return await _context.Messages
                 .Where(r => r.MessageType == MessageType.Primary)
                 .Include(r => r.Replies)
                 .OrderByDescending(r => r.CreatedAt)
-                .Skip((int)(numOfResults * (page ?? 0)))
-                .Take((int)numOfResults)
+                .Skip(skip)
+                .Take(filter.PageSize)
                 .ToListAsync(token);
-
-            return new DefaultResult<IEnumerable<Message>>(requestContents);
         }
 
         public async Task<DefaultResult> AddMessageAsync(IndexRequest content, CancellationToken token = default)

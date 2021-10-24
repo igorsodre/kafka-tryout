@@ -11,9 +11,8 @@ namespace API.Services.Interfaces
     {
         public Task<DefaultResult<Message>> GetMessageAsync(string id, CancellationToken token = default);
 
-        public Task<DefaultResult<IEnumerable<Message>>> GetMessagesAsync(
-            uint? page,
-            uint? numOfRows,
+        public Task<IList<Message>> GetMessagesAsync(
+            PaginationFilter filter,
             CancellationToken token = default
         );
 

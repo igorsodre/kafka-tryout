@@ -1,9 +1,14 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using API.Domain;
+using API.Helpers;
 using API.Services.Interfaces;
+using AutoMapper;
 using Contracts.Requests;
+using Contracts.Requests.Queries;
 using Contracts.Responses;
 using DataAccess.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +20,14 @@ namespace API.Controllers
     public class IndexController : ControllerBase
     {
         private readonly IMessageRepository _messageRepository;
+        private readonly IMapper _mapper;
+        private readonly IUriService _uriService;
 
-        public IndexController(IMessageRepository messageRepository)
+        public IndexController(IMessageRepository messageRepository, IMapper mapper, IUriService uriService)
         {
             _messageRepository = messageRepository;
+            _mapper = mapper;
+            _uriService = uriService;
         }
 
         [HttpPost]
@@ -35,16 +44,13 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(uint? page, uint? numOfRows, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index([FromQuery] PaginationQuery query, CancellationToken cancellationToken)
         {
-            var result =
-                await _messageRepository.GetMessagesAsync(page, numOfRows, cancellationToken);
-            if (!result.Success)
-            {
-                return BadRequest(new ErrorResponse(result.ErrorMessages));
-            }
+            var pagedFilter = _mapper.Map<PaginationFilter>(query);
 
-            return Ok(new SuccessResponse<IEnumerable<Message>>(result.Data));
+            var result = await _messageRepository.GetMessagesAsync(pagedFilter, cancellationToken);
+
+            return Ok(PaginationHelpers.CreatePaginatedResponse(_uriService.GetMessages, pagedFilter, result.ToList()));
         }
     }
 }
