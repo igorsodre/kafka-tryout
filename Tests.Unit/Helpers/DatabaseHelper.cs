@@ -3,22 +3,32 @@ using System.Reflection;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
-namespace Test.TestHelpers
+namespace Tests.Unit.Helpers
 {
     public class DatabaseHelper
     {
+        private static readonly object Lock = new();
+
+        private static DataContext _context;
+        
         public static DataContext GetCleanDatabaseContext()
         {
-            var context = new DataContext(GetDbContextOption());
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
+            lock (Lock)
+            {
+                if (_context is null)
+                {
+                    _context = new DataContext(GetDbContextOption());
+                }
 
-            return context;
+                _context.Database.EnsureDeleted();
+                _context.Database.EnsureCreated();
+            }
+
+            return _context;
         }
 
-        private static DbContextOptions<DataContext> GetDbContextOption()
+        public static DbContextOptions<DataContext> GetDbContextOption()
         {
             return new DbContextOptionsBuilder<DataContext>()
                 .UseSqlServer(GetTestDbConnectionString)
@@ -27,7 +37,7 @@ namespace Test.TestHelpers
 
         private static string _testDbConnectionString;
 
-        private static string GetTestDbConnectionString
+        public static string GetTestDbConnectionString
         {
             get
             {
