@@ -18,7 +18,6 @@ namespace API.Services
     public class MessageRepository : IMessageRepository
     {
         private readonly DataContext _context;
-        private const int MaxPageSize = 30;
 
         public MessageRepository(DataContext context)
         {

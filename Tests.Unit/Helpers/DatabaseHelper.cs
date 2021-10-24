@@ -16,10 +16,7 @@ namespace Tests.Unit.Helpers
         {
             lock (Lock)
             {
-                if (_context is null)
-                {
-                    _context = new DataContext(GetDbContextOption());
-                }
+                _context ??= new DataContext(GetDbContextOption());
 
                 _context.Database.EnsureDeleted();
                 _context.Database.EnsureCreated();

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Domain;
@@ -24,11 +25,14 @@ namespace Tests.Unit.Services
 
 
         [Fact]
-        public async Task GetMessagesAsync_WhenDatabaseHasMessages_RetunsResultWithThem()
+        public async Task GetMessagesAsync_WhenDatabaseHasMessages_RetunsResultWithThem_BaseCase()
         {
             // Arrange
-            var messages = Fixture.CreateMany<string>(15)
-                .Select(str => new Message { Content = str, MessageType = MessageType.Primary })
+            var messages = Fixture.Build<Message>()
+                .With(x => x.MessageType, MessageType.Primary)
+                .With(x => x.MainMessageId, () => null)
+                .With(x => x.Replies, new List<Message>())
+                .CreateMany(30)
                 .ToList();
 
             Context.Messages.AddRange(messages);
@@ -40,7 +44,30 @@ namespace Tests.Unit.Services
 
             // Assert
             result.Should()
-                .BeEquivalentTo(messages);
+                .BeEquivalentTo(messages.OrderByDescending(x => x.CreatedAt).Take(15));
+        }
+        
+        [Fact]
+        public async Task GetMessagesAsync_WhenDatabaseHasMessages_RetunsResultWithThem_PaginatedCase()
+        {
+            // Arrange
+            var messages = Fixture.Build<Message>()
+                .With(x => x.MessageType, MessageType.Primary)
+                .With(x => x.MainMessageId, () => null)
+                .With(x => x.Replies, new List<Message>())
+                .CreateMany(45)
+                .ToList();
+
+            Context.Messages.AddRange(messages);
+            await Context.SaveChangesAsync();
+
+
+            // Act
+            var result = await _sut.GetMessagesAsync(new PaginationFilter { PageNumber = 3, PageSize = 15 });
+
+            // Assert
+            result.Should()
+                .BeEquivalentTo(messages.OrderByDescending(x => x.CreatedAt).Skip(30).Take(15));
         }
     }
 }
