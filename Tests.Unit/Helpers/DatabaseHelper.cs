@@ -4,56 +4,50 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace Tests.Unit.Helpers
+namespace Tests.Unit.Helpers;
+
+public class DatabaseHelper
 {
-    public class DatabaseHelper
+    private static readonly object Lock = new();
+
+    private static DataContext _context;
+
+    public static DataContext GetCleanDatabaseContext()
     {
-        private static readonly object Lock = new();
-
-        private static DataContext _context;
-        
-        public static DataContext GetCleanDatabaseContext()
+        lock (Lock)
         {
-            lock (Lock)
-            {
-                _context ??= new DataContext(GetDbContextOption());
+            _context ??= new DataContext(GetDbContextOption());
 
-                _context.Database.EnsureDeleted();
-                _context.Database.EnsureCreated();
-            }
-
-            return _context;
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
         }
 
-        public static DbContextOptions<DataContext> GetDbContextOption()
-        {
-            return new DbContextOptionsBuilder<DataContext>()
-                .UseSqlServer(GetTestDbConnectionString)
-                .Options;
-        }
+        return _context;
+    }
 
-        private static string _testDbConnectionString;
+    public static DbContextOptions<DataContext> GetDbContextOption()
+    {
+        return new DbContextOptionsBuilder<DataContext>()
+            .UseSqlServer(GetTestDbConnectionString)
+            .Options;
+    }
 
-        public static string GetTestDbConnectionString
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(_testDbConnectionString))
-                {
-                    return _testDbConnectionString;
-                }
+    private static string _testDbConnectionString;
 
-                var buildDir = Path.GetDirectoryName(
-                    Assembly.GetExecutingAssembly()
-                        .Location
-                );
-                var filePath = Path.Combine(buildDir, "databasesettings.json");
-                return _testDbConnectionString = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile(filePath)
-                    .Build()
-                    .GetConnectionString("SqlServerTest");
-            }
-        }
+    public static string GetTestDbConnectionString =>
+        _testDbConnectionString ?? DbConnectionStringFromConfigurationFile();
+
+    private static string DbConnectionStringFromConfigurationFile()
+    {
+        var buildDir = Path.GetDirectoryName(
+            Assembly.GetExecutingAssembly()
+                .Location
+        );
+        var filePath = Path.Combine(buildDir, "databasesettings.json");
+        return _testDbConnectionString = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile(filePath)
+            .Build()
+            .GetConnectionString("SqlServerTest");
     }
 }

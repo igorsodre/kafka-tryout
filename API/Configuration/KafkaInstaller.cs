@@ -9,24 +9,24 @@ using Confluent.SchemaRegistry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace API.Configuration
-{
-    public class KafkaInstaller : IServiceInstaller
-    {
-        public void InstallServices(IServiceCollection services, IConfiguration configuration)
-        {
-            ConfigureProducers(services, configuration);
-            ConfigureSchemaRegistry(services, configuration);
-            ConfigureConsumers(services, configuration);
-            ConfigureEventHandlers(services);
-        }
+namespace API.Configuration;
 
-        private static void ConfigureConsumers(IServiceCollection services, IConfiguration configuration)
-        {
-            var kafkaConsumerConfig = new ConsumerConfiguration();
-            configuration.GetSection("Kafka:Consumers")
-                .Bind(kafkaConsumerConfig);
-            services.AddSingleton(new ConsumerConfig
+public class KafkaInstaller : IServiceInstaller
+{
+    public void InstallServices(IServiceCollection services, IConfiguration configuration)
+    {
+        ConfigureProducers(services, configuration);
+        ConfigureSchemaRegistry(services, configuration);
+        ConfigureConsumers(services, configuration);
+        ConfigureEventHandlers(services);
+    }
+
+    private static void ConfigureConsumers(IServiceCollection services, IConfiguration configuration)
+    {
+        var kafkaConsumerConfig = new ConsumerConfiguration();
+        configuration.GetSection("Kafka:Consumers").Bind(kafkaConsumerConfig);
+        services.AddSingleton(
+            new ConsumerConfig
             {
                 BootstrapServers = kafkaConsumerConfig.BootstrapServers,
                 GroupId = kafkaConsumerConfig.GroupId,
@@ -38,38 +38,51 @@ namespace API.Configuration
                 AutoOffsetReset = kafkaConsumerConfig.AutoOffsetReset,
                 MaxPollIntervalMs = kafkaConsumerConfig.MaxPollIntervalMs,
                 SessionTimeoutMs = kafkaConsumerConfig.SessionTimeoutMs
-            });
-        }
+            }
+        );
+        services.AddScoped(
+            provider => {
+                var config = provider.GetRequiredService<ConsumerConfig>();
+                return new ConsumerBuilder<string, string>(config).Build();
+            }
+        );
+    }
 
-        private static void ConfigureSchemaRegistry(IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddSingleton(new SchemaRegistryConfig
-            {
-                Url = configuration.GetValue<string>("Kafka:SchemaRegistry:Url")
-            });
-        }
+    private static void ConfigureSchemaRegistry(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton(
+            new SchemaRegistryConfig { Url = configuration.GetValue<string>("Kafka:SchemaRegistry:Url") }
+        );
+    }
 
-        private static void ConfigureProducers(IServiceCollection services, IConfiguration configuration)
-        {
-            var kafkaProducerConfig = new ProducerConfiguration();
-            configuration.GetSection("Kafka:Producers")
-                .Bind(kafkaProducerConfig);
-            services.AddSingleton(new ProducerConfig
+    private static void ConfigureProducers(IServiceCollection services, IConfiguration configuration)
+    {
+        var kafkaProducerConfig = new ProducerConfiguration();
+        configuration.GetSection("Kafka:Producers").Bind(kafkaProducerConfig);
+        services.AddSingleton(
+            new ProducerConfig
             {
                 BootstrapServers = kafkaProducerConfig.BootstrapServers,
                 Acks = kafkaProducerConfig.Acks,
                 MessageSendMaxRetries = kafkaProducerConfig.MessageSendMaxRetries,
                 RetryBackoffMs = kafkaProducerConfig.RetryBackoffMs,
                 EnableIdempotence = kafkaProducerConfig.EnableIdempotence,
-            });
-        }
+            }
+        );
 
-        private static void ConfigureEventHandlers(IServiceCollection services)
-        {
-            services.AddHostedService<ProcessOrdersBackgroundService>();
+        services.AddScoped(
+            provider => {
+                var config = provider.GetRequiredService<ProducerConfig>();
+                return new ProducerBuilder<string, string>(config).Build();
+            }
+        );
+    }
 
-            services.AddSingleton<IEventProducer<Order>, OrdersProducer>();
-            services.AddSingleton<IEventConsumer<Order>, OrdersConsumer>();
-        }
+    private static void ConfigureEventHandlers(IServiceCollection services)
+    {
+        services.AddHostedService<ProcessOrdersBackgroundService>();
+
+        services.AddSingleton<IEventProducer<Order>, OrdersProducer>();
+        services.AddSingleton<IEventConsumer<Order>, OrdersConsumer>();
     }
 }

@@ -1,17 +1,16 @@
 using System;
 using DataAccess;
 
-namespace Tests.Unit.Helpers
+namespace Tests.Unit.Helpers;
+
+public class DbContextFixture : IDisposable
 {
-    public class DbContextFixture : IDisposable
+    public DataContext Context;
+
+    public DbContextFixture()
     {
-        public DataContext Context;
-
-        public DbContextFixture()
-        {
-            Context = DatabaseHelper.GetCleanDatabaseContext();
-        }
-
-        public void Dispose() { }
+        Context = DatabaseHelper.GetCleanDatabaseContext();
     }
+
+    public void Dispose() { }
 }

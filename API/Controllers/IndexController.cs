@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using API.Domain;
@@ -10,47 +8,45 @@ using AutoMapper;
 using Contracts.Requests;
 using Contracts.Requests.Queries;
 using Contracts.Responses;
-using DataAccess.Entities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers
+namespace API.Controllers;
+
+[ApiController]
+[Route("api/index")]
+public class IndexController : ControllerBase
 {
-    [ApiController]
-    [Route("api/index")]
-    public class IndexController : ControllerBase
+    private readonly IMessageRepository _messageRepository;
+    private readonly IMapper _mapper;
+    private readonly IUriService _uriService;
+
+    public IndexController(IMessageRepository messageRepository, IMapper mapper, IUriService uriService)
     {
-        private readonly IMessageRepository _messageRepository;
-        private readonly IMapper _mapper;
-        private readonly IUriService _uriService;
+        _messageRepository = messageRepository;
+        _mapper = mapper;
+        _uriService = uriService;
+    }
 
-        public IndexController(IMessageRepository messageRepository, IMapper mapper, IUriService uriService)
+    [HttpPost]
+    public async Task<IActionResult> Index(IndexRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _messageRepository.AddMessageAsync(request, cancellationToken);
+
+        if (!result.Success)
         {
-            _messageRepository = messageRepository;
-            _mapper = mapper;
-            _uriService = uriService;
+            return BadRequest(new ErrorResponse(result.ErrorMessages));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Index(IndexRequest request, CancellationToken cancellationToken)
-        {
-            var result = await _messageRepository.AddMessageAsync(request, cancellationToken);
+        return Ok(SuccessResponse.DefaultOkResponse());
+    }
 
-            if (!result.Success)
-            {
-                return BadRequest(new ErrorResponse(result.ErrorMessages));
-            }
+    [HttpGet]
+    public async Task<IActionResult> Index([FromQuery] PaginationQuery query, CancellationToken cancellationToken)
+    {
+        var pagedFilter = _mapper.Map<PaginationFilter>(query);
 
-            return Ok(SuccessResponse.DefaultOkResponse());
-        }
+        var result = await _messageRepository.GetMessagesAsync(pagedFilter, cancellationToken);
 
-        [HttpGet]
-        public async Task<IActionResult> Index([FromQuery] PaginationQuery query, CancellationToken cancellationToken)
-        {
-            var pagedFilter = _mapper.Map<PaginationFilter>(query);
-
-            var result = await _messageRepository.GetMessagesAsync(pagedFilter, cancellationToken);
-
-            return Ok(PaginationHelpers.CreatePaginatedResponse(_uriService.GetMessages, pagedFilter, result.ToList()));
-        }
+        return Ok(PaginationHelpers.CreatePaginatedResponse(_uriService.GetMessages, pagedFilter, result.ToList()));
     }
 }

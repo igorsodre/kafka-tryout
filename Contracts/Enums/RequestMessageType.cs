@@ -1,8 +1,7 @@
-namespace Contracts.Enums
+namespace Contracts.Enums;
+
+public enum RequestMessageType
 {
-    public enum RequestMessageType
-    {
-        Primary = 1,
-        Reply = 2
-    }
+    Primary = 1,
+    Reply = 2
 }

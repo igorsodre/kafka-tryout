@@ -5,18 +5,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace API.Configuration
+namespace API.Configuration;
+
+public class DatabaseInstaller : IServiceInstaller
 {
-    public class DatabaseInstaller : IServiceInstaller
+    public void InstallServices(IServiceCollection services, IConfiguration configuration)
     {
-        public void InstallServices(IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddDbContext<DataContext>(options => {
-                options.UseSqlServer(DataAccessLibraryConfig.GetConnectionString());
-            });
+        services.AddDbContext<DataContext>(options => {
+            options.UseSqlServer(DataAccessLibraryConfig.GetConnectionString());
+        });
 
 
-            services.AddScoped<IMessageRepository, MessageRepository>();
-        }
+        services.AddScoped<IMessageRepository, MessageRepository>();
     }
 }

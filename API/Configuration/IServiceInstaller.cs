@@ -1,10 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace API.Configuration
+namespace API.Configuration;
+
+public interface IServiceInstaller
 {
-    public interface IServiceInstaller
-    {
-        public void InstallServices(IServiceCollection services, IConfiguration configuration);
-    }
+    public void InstallServices(IServiceCollection services, IConfiguration configuration);
 }

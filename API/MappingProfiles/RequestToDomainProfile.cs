@@ -2,13 +2,12 @@ using API.Domain;
 using Contracts.Requests.Queries;
 using AutoMapper;
 
-namespace API.MappingProfiles
+namespace API.MappingProfiles;
+
+public class RequestToDomainProfile : Profile
 {
-    public class RequestToDomainProfile : Profile
+    public RequestToDomainProfile()
     {
-        public RequestToDomainProfile()
-        {
-            CreateMap<PaginationQuery, PaginationFilter>();
-        }
+        CreateMap<PaginationQuery, PaginationFilter>();
     }
 }

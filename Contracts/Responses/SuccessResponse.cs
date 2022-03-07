@@ -1,22 +1,21 @@
-namespace Contracts.Responses
+namespace Contracts.Responses;
+
+public class SuccessResponse<T>
 {
-    public class SuccessResponse<T>
+    public SuccessResponse() { }
+
+    public SuccessResponse(T response)
     {
-        public SuccessResponse() { }
-
-        public SuccessResponse(T response)
-        {
-            Data = response;
-        }
-
-        public T Data { get; set; }
+        Data = response;
     }
 
-    public class SuccessResponse : SuccessResponse<string>
+    public T Data { get; set; }
+}
+
+public class SuccessResponse : SuccessResponse<string>
+{
+    public static SuccessResponse<string> DefaultOkResponse()
     {
-        public static SuccessResponse<string> DefaultOkResponse()
-        {
-            return new SuccessResponse<string>("OK");
-        }
+        return new SuccessResponse<string>("OK");
     }
 }

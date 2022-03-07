@@ -1,10 +1,9 @@
 using System;
 
-namespace API.Domain
+namespace API.Domain;
+
+public class Order
 {
-    public class Order
-    {
-        public Guid ProductId { get; set; }
-        public int Quantity { get; set; }
-    }
+    public Guid ProductId { get; set; }
+    public int Quantity { get; set; }
 }

@@ -1,8 +1,7 @@
-namespace DataAccess.Enums
+namespace DataAccess.Enums;
+
+public enum MessageType
 {
-    public enum MessageType
-    {
-        Primary = 1,
-        Reply = 2
-    }
+    Primary = 1,
+    Reply = 2
 }
